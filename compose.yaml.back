@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.python
+    environment:
+      - DB_HOST=db
+      - DB_USER=app
+      - DB_PASSWORD=very_strong
+      - DB_NAME=example
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: very_strong
+      MYSQL_DATABASE: example
+      MYSQL_USER: app
+      MYSQL_PASSWORD: very_strong
+    ports:
+      - "3306:3306"
+

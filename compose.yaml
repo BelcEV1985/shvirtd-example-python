@@ -1,26 +1,46 @@
 version: '3.8'
+
 services:
   web:
     build:
       context: .
       dockerfile: Dockerfile.python
+    restart: always
+    networks:
+      backend:
+        ipv4_address: 172.20.0.5
     environment:
-      - DB_HOST=db
-      - DB_USER=app
-      - DB_PASSWORD=very_strong
-      - DB_NAME=example
-    ports:
-      - "5000:5000"
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
     depends_on:
       - db
 
   db:
-    image: mysql:5.7
+    image: mysql:8
+    restart: always
+    networks:
+      backend:
+        ipv4_address: 172.20.0.10
     environment:
-      MYSQL_ROOT_PASSWORD: very_strong
-      MYSQL_DATABASE: example
-      MYSQL_USER: app
-      MYSQL_PASSWORD: very_strong
-    ports:
-      - "3306:3306"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+networks:
+  backend:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+
+volumes:
+  mysql_data:
+
+include:
+  - proxy.yaml
 
